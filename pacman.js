@@ -29,7 +29,12 @@ window.onload = function(){
     board.height = boardHeight;
     board.width = boardWidth;
     context = board.getContext("2d");// used to draw on board
+
     loadImages();
+    loadMap();
+    console.log(walls.size);
+    console.log(foods.size);
+    console.log(ghosts.size); 
 
 }
 
@@ -94,7 +99,8 @@ function loadMap() {
     foods.clear();
     ghosts.clear(); 
 
-    for (let r = 0; r < rowCount; r++) {
+   
+     for (let r = 0; r < rowCount; r++) {
         for (let c = 0; c , columnCount;c++){
             const row = tileMap[r];
             const tileMapChar = row[c];
@@ -130,13 +136,16 @@ function loadMap() {
             else if (tileMapChar == ' ') {// empty spaces are food
                 const food = new Block(null, x + 14, Y + 14, 4 ,4 );
                 foods.add(food);
-                
+
 
             }
     }
+     }
 }
+
 class Block{
-    constructor(image, x, y, width, height){
+
+constructor(image, x, y, width, height){
         this.image = image;
         this.x = x;
         this.width = width;
@@ -144,8 +153,5 @@ class Block{
         this.height = height;
 
         this.startX = x;
-        this.startY = y;
-
-
-    }
+        this.startY = y;}
 }
