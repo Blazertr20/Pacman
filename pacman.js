@@ -32,9 +32,12 @@ window.onload = function(){
 
     loadImages();
     loadMap();
-    console.log(walls.size);
-    console.log(foods.size);
-    console.log(ghosts.size); 
+    //console.log(walls.size);
+   // console.log(foods.size);
+   // console.log(ghosts.size); 
+   update();
+   document.addEventListener("keyup, movePacman);
+
 
 }
 
@@ -142,6 +145,74 @@ function loadMap() {
     }
      }
 }
+function update(){
+    move ();
+    draw();
+    setTimeout(update, 50);
+}
+
+function draw(){
+    context.clearRect(0, 0, board.width, board.height); 
+    context.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height);
+    for (let ghost of ghosts.values()){
+        context.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height);
+    }
+    for (let wall of walls.values() {
+        context.drawImage(wall.image, wall.x wall.y, wall.width, wall.height);
+    }
+    context.fillStyle = "white";
+    for(let food of foods.values()) {
+        context.fillRect(food.x, food.y, food.width, food.height);
+
+    }
+
+}
+
+function move (){
+    pacman.x += pacman.velocityX;
+    pacman.y += pacman.velocityY;
+
+    //check for wall collision
+
+    for (let wall of walls.values()){
+        if (collison(pacman, wall)){
+            pacman.x -= pacman.velocityX;
+            pacman.y -= pacman.velocityY;
+            break;
+        }
+    }
+
+}
+
+function movePacman(e) {
+    if (e.code == "ArrowUp"|| e.code == "KeyW"){
+        pacman.updateDirection ('U');
+    }
+    else if (e.code == "ArrowDown" || e.code == "KeyS"){
+        pacman.updateDirection ('D');
+    }
+    else if (e.code == "ArrowLeft" || e.code == KeyA){
+        pacman.updateDirection ('L');
+    }
+    else if (e.code == "ArrowRight" || e.code == KeyD){
+        pacman.upadeDirection ('R');
+    }
+    //update pacman image 
+
+    if (pacman.direction == 'U'){
+        pacman.image= pacmanUpImage;
+
+    }
+  
+}
+
+function collison (a,b){
+    return a.x< b.x + b.width &&
+           a.x + a.width > b.x &&
+           a.y <  b.y + b.height &&
+           a.y < a.height > b.y;
+}
+
 
 class Block{
 
@@ -153,5 +224,50 @@ constructor(image, x, y, width, height){
         this.height = height;
 
         this.startX = x;
-        this.startY = y;}
+        this.startY = y;
+
+        this.direction = 'R';
+        this.velocityX = 0;
+        this.velocityY = 0;
+
+    }
+    updateDirection(direction ){
+        const preDirection = this.direction;
+        this.direction = direction;
+        this.updateVelocity ();
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        
+        for (let wall of walls.values()){
+            if(collision(this, wall)){
+                this.x -=this.velocityX;
+                this.y -=this.velocityY;
+                this.direction = prevDirection;
+                this.updateVelocity();
+                return;
+            }
+        }
+
+
+    }
+    updateVelocity() {
+        if(this.direction == 'U'){
+            this.velocityX= 0;
+            this.velocityY = -tileSize/4;
+        }
+        else if (this.direction == 'D') {
+            this.velocityX = 0;
+            this.velocityY = tileSize/4
+        }
+        else if (this.direction == 'L') {
+            this.velocityX = -tileSize/4;
+            this.velocityY = 0;
+        }
+        else if (this.direction == 'R') {
+            this.velocityX = tileSize/4;
+            this.velocityY = 0;
+        }
+    }
+
+
 }
