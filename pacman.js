@@ -53,7 +53,9 @@ const ghosts = new Set ();
 let pacman;
 
 const direction = ['U', 'D', 'L', 'R']; //up down left n right
-
+let score = 0;
+let lives = 3;
+let gameOver = false;
 
 
 
@@ -154,9 +156,13 @@ function loadMap() {
      }
 }
 function update(){
+    if (gameOver){
+        return;
+    }
     move ();
     draw();
     setTimeout(update, 50);
+
 }
 
 function draw(){
@@ -173,6 +179,17 @@ function draw(){
         context.fillRect(food.x, food.y, food.width, food.height);
 
     }
+
+    //score
+    context.fillStyle = "white"
+    context.font= "14px sans-serif";
+    if(gameOver){
+        context.fillText("Game Over: " + String(score), tileSize/2, tileSize/2);
+    }
+    else{
+        context.fillText("x" + String(lives) + " " + String(score), tileSize/2, tileSize/2);
+    }
+
 
 }
 
@@ -191,11 +208,26 @@ function move (){
     }
 
     for (let ghost of ghosts.values()){
+         if (collision(ghost, pacman)){
+            lives -= 1;
+            if(lives == 0){
+                gameOver = true;
+                return;
+            }
+            resetPositions();
+         }
+
+        if (ghost.y == tileSize*9 && ghost.direction != 'U' && ghost.direction != 'D'){
+            ghost.updateDirection('U');
+        }
+
+
+
     ghost.x += ghost.velocityX;
     ghost.y += ghost.velocityY;
     for (let wall of walls.values()){
-        if(collision(ghost,wall)){
-            ghost.x -= ghost.velocityX;
+        if(collision(ghost,wall) || ghost.x <= 0 || ghost.x + ghost.width >= boardWidth) {
+             ghost.x -= ghost.velocityX;
             ghost.y -= ghost.velocityY;
             const newDirection = direction[Math.floor(Math.random()*4)];
             ghost.updateDirection(newDirection);
@@ -203,9 +235,36 @@ function move (){
     }
 }
 
+// food tthat's been eaten
+let foodEaten = null;
+for (let food of foods.values()){
+    if (collision(pacman, food)){
+        foodEaten = food;
+        score += 10;
+        break;
+    }
+}
+foods.delete(foodEaten);
+
+// next level
+if (foods.size== 0){
+    loadMap();
+    resetPositions();
+
+}
 }
 
+
 function movePacman(e) {
+    if (gameOver){
+        loadMap();
+        resetPositions();
+        lives = 3;
+        score = 0;
+        gameOver = false;
+        update();// game loop restart
+        return;
+    }
     if (e.code == "ArrowUp"|| e.code == "KeyW"){
         pacman.updateDirection ('U');
     }
@@ -242,6 +301,18 @@ function collision (a,b){
            a.x + a.width > b.x &&
            a.y <  b.y + b.height &&
            a.y + a.height > b.y;
+}
+
+function resetPositions(){
+    pacman.reset();
+    pacman.velocityX = 0;
+    pacman.velocityY = 0;
+    for(let ghost of ghosts.values()){
+        ghost.reset();
+        const newDirection = direction[Math.floor(Math.random()*4)];
+        ghost.updateDirection(newDirection);
+
+    }
 }
 
 
@@ -298,6 +369,12 @@ constructor(image, x, y, width, height){
             this.velocityX = tileSize/4;
             this.velocityY = 0;
         }
+    }
+
+    reset(){
+        this.x = this.startX;
+        this.y = this.startY;
+
     }
 
 
