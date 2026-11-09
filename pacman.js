@@ -56,6 +56,8 @@ const direction = ['U', 'D', 'L', 'R']; //up down left n right
 let score = 0;
 let lives = 3;
 let gameOver = false;
+let gameOvertime = 0 
+const Gameoverscreentime = 8000; //game over screen time
 
 
 
@@ -157,6 +159,8 @@ function loadMap() {
 }
 function update(){
     if (gameOver){
+        draw(); 
+    setTimeout(update, 50);
         return;
     }
     move ();
@@ -166,13 +170,16 @@ function update(){
 }
 
 function draw(){
+
     context.clearRect(0, 0, board.width, board.height); 
     context.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height);
     for (let ghost of ghosts.values()){
         context.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height);
     }
     for (let wall of walls.values()) {
-        context.drawImage(wall.image, wall.x,wall.y, wall.width, wall.height);
+        context.fillStyle = "blue";
+        context.fillRect(wall.x, wall.y, wall.width, wall.height);
+        
     }
     context.fillStyle = "white";
     for(let food of foods.values()) {
@@ -190,7 +197,73 @@ function draw(){
         context.fillText("x" + String(lives) + " " + String(score), tileSize/2, tileSize/2);
     }
 
+    // game over screen
+    if (gameOver == true) drawgameOver();
 
+}
+
+function drawgameOver(){// dim the map
+            context.fillStyle = "rgba(0, 0, 0, 0.75)";
+        context.fillRect(0, 0, board.width, board.height);
+        context.textAlign = "center";
+
+        //Big game over sign
+        context.fillStyle = "#ff4040";
+        context.font = "bold 64px sans-serif";
+        context.fillText("GAME OVER", boardWidth/2, boardHeight/2-60);
+
+        //final score
+        context.fillStyle = "white";
+        context.font = "28px sans-serif";
+        context.fillText("Score: " + score, boardWidth/2, boardHeight/2 - 10);
+
+        const elapsed = Date.now() - gameOvertime
+        const remaining = Math.ceil((Gameoverscreentime - elapsed)/1000);
+
+        context.fillStyle = "#ffd54a";
+        context.font = "20px sans-serif";
+        if (remaining > 0){
+            context.fillText("Play again in " + remaining + "s" ,boardWidth/ 2, boardHeight /2 + 40);}
+            context.textAlign = "left";
+
+
+         // press to restart
+
+        context.fillStyle = "#ffd54a";
+        context.font = "20px sans-serif";
+        context.fillText("Press any key to play again", boardWidth/2, boardHeight / 2 + 70);
+        context.textAlign = "left";
+
+
+}
+
+
+
+
+
+
+
+
+
+
+function collision (a,b){
+     return a.x< b.x + b.width &&
+           a.x + a.width > b.x &&
+           a.y <  b.y + b.height &&
+           a.y + a.height > b.y;
+
+}
+                                        
+
+  
+function resetPositions(){
+     pacman.reset();
+    pacman.velocityX = 0;
+    pacman.velocityY = 0;
+    for(let ghost of ghosts.values()){
+        ghost.reset();
+        const newDirection = direction[Math.floor(Math.random()*4)];
+        ghost.updateDirection(newDirection);}
 }
 
 function move (){
@@ -212,6 +285,7 @@ function move (){
             lives -= 1;
             if(lives == 0){
                 gameOver = true;
+                gameOvertime = Date.now();
                 return;
             }
             resetPositions();
@@ -244,7 +318,8 @@ for (let food of foods.values()){
         break;
     }
 }
-foods.delete(foodEaten);
+if (foodEaten) foods.delete(foodEaten);
+
 
 // next level
 if (foods.size== 0){
@@ -257,14 +332,17 @@ if (foods.size== 0){
 
 function movePacman(e) {
     if (gameOver){
+        if (Date.now() - gameOvertime < Gameoverscreentime)
+         return;
+            
         loadMap();
         resetPositions();
         lives = 3;
         score = 0;
         gameOver = false;
-        update();// game loop restart
         return;
     }
+    
     if (e.code == "ArrowUp"|| e.code == "KeyW"){
         pacman.updateDirection ('U');
     }
@@ -293,26 +371,7 @@ function movePacman(e) {
         pacman.image = pacmanLeftImage;
     }
 
-  
-}
 
-function collision (a,b){
-    return a.x< b.x + b.width &&
-           a.x + a.width > b.x &&
-           a.y <  b.y + b.height &&
-           a.y + a.height > b.y;
-}
-
-function resetPositions(){
-    pacman.reset();
-    pacman.velocityX = 0;
-    pacman.velocityY = 0;
-    for(let ghost of ghosts.values()){
-        ghost.reset();
-        const newDirection = direction[Math.floor(Math.random()*4)];
-        ghost.updateDirection(newDirection);
-
-    }
 }
 
 
