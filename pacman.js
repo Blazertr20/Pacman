@@ -90,13 +90,13 @@ function loadImages(){
     wallImage.src ="./wall.png";
 
     blueGhostImage = new Image();
-    blueGhostImage.src = "./blueghost.png";
+    blueGhostImage.src = "./blueGhost.png";
     orangeGhostImage = new Image();
-    orangeGhostImage.src = "./orangeghost.png";
+    orangeGhostImage.src = "./orangeGhost.png";
     pinkGhostImage = new Image ();
-    pinkGhostImage.src = "./pinkghost.png";
+    pinkGhostImage.src = "./pinkGhost.png";
     redGhostImage = new Image ();
-    redGhostImage.src = "./redghost.png";
+    redGhostImage.src = "./redGhost.png";
 
     pacmanUpImage = new Image();
     pacmanUpImage.src = "./pacmanup.png";
