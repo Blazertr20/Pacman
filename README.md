@@ -8,7 +8,8 @@ Open the website using the link. Use your arrow keys and WASD to move your pacma
 The ghosts are replaced by monsters like slime and a little imp.
 
 # Latest Update #
-Press any key to play again doesn't work.
+Press any key to play again doesn't work.Game ove rscreen after you die , that shows how many mintues it took for you to die, as well as your score.
 
 # sources/inspo #
 https://youtu.be/WxeTMsaSOaA?si=9Av_c_onFX0n0BG6 
+Made using C++ , HTML and Javascript
